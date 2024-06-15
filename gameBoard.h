@@ -4,10 +4,29 @@
 
 #ifndef TETRIS_GAMEBOARD_H
 #define TETRIS_GAMEBOARD_H
+#include "structs.h"
+#include "iostream"
+#include "iomanip"
 
 
 class gameBoard {
+    gameTile board[21][10];
+    piece currentPiece;
+    unsigned short level;
 
+public:
+    gameBoard(unsigned short level);
+
+    //======//Debug//======//
+    void debugDisplay();
+    void debugSetTile(int y, int x, bool empty, enum color color);
+
+    //======//Functions//======//
+    void setBoardEmpty();
+
+    //======//Getters//======//
+    inline bool isEmpty(int y, int x);
+    inline enum color getColor(int y, int x);
 };
 
 
