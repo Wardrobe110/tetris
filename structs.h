@@ -7,7 +7,7 @@
 
 enum color{
     RED,
-    ORANGE,
+    WHITE,  //Typically orange
     YELLOW,
     GREEN,
     BLUE,

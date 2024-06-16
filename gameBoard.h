@@ -12,7 +12,9 @@
 class gameBoard {
     gameTile board[21][10];
     piece currentPiece;
+    piece heldPiece;
     unsigned short level;
+    int score;
 
 public:
     gameBoard(unsigned short level);

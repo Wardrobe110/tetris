@@ -28,8 +28,8 @@ void gameBoard::debugDisplay() {
                     case RED:
                         std::cout<<"R";
                         break;
-                    case ORANGE:
-                        std::cout<<"O";
+                    case WHITE:
+                        std::cout<<"W";
                         break;
                     case YELLOW:
                         std::cout<<"Y";
