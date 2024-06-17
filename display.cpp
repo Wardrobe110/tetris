@@ -11,7 +11,7 @@ display::display(gameBoard &game): game(game) {
 }
 
 //============//Elements//============//
-ftxui::Element display::heldPieceDisplay(enum color pieceColor) {
+ftxui::Element display::heldPieceDisplay(enum color pieceColor, bool isHoldingPiece) {
     using namespace ftxui;
     auto makeBoxHold = [](enum color pieceColor) {
         auto pieceShape = vbox();
@@ -75,8 +75,11 @@ ftxui::Element display::heldPieceDisplay(enum color pieceColor) {
                       pieceShape | hcenter ) |
                       size(WIDTH, EQUAL, 12) | size(HEIGHT, EQUAL, 7);
     };
-    return makeBoxHold(pieceColor);
-
+    if(isHoldingPiece){
+        return makeBoxHold(pieceColor);
+    }else return window(text("HOLD") | hcenter | bold,
+                        separatorEmpty() )|
+                 size(WIDTH, EQUAL, 12) | size(HEIGHT, EQUAL, 7);
 }
 
 
@@ -153,40 +156,98 @@ ftxui::Element display::gameBoardDisplay() {
     return vbox(elementsGrid) | border | size(WIDTH, EQUAL, 42) | size(HEIGHT, EQUAL, 42);
 }
 
+ftxui::Element display::nextPiecesDisplay(std::vector<enum color> nextColors) {
+    using namespace ftxui;
+    std::vector<Element> piece;
+    std::vector<Element> piecesCol;
+    //enum color colors[3] = {VIOLET, YELLOW, WHITE};
+    for(int i = 0; i < 3; i++){
+        piece.emplace_back(separatorEmpty());
+        switch(nextColors[i]){
+            case RED:
+                piece.emplace_back(hbox(text("     "),bgcolor(Color::Red, text("  "))));
+                piece.emplace_back(hbox(text("   "),bgcolor(Color::Red, text("    "))));
+                piece.emplace_back(hbox(text("   "),bgcolor(Color::Red, text("  "))));
+                break;
+            case WHITE:
+                piece.emplace_back(hbox(text("   "),bgcolor(Color::White, text("    "))));
+                piece.emplace_back(hbox(text("     "),bgcolor(Color::White, text("  "))));
+                piece.emplace_back(hbox(text("     "),bgcolor(Color::White, text("  "))));
+                break;
+            case YELLOW:
+                piece.emplace_back(separatorEmpty());
+                piece.emplace_back(hbox(text("   "),bgcolor(Color::Yellow, text("    "))));
+                piece.emplace_back(hbox(text("   "),bgcolor(Color::Yellow, text("    "))));
+                break;
+            case GREEN:
+                piece.emplace_back(hbox(text("   "),bgcolor(Color::Green, text("  "))));
+                piece.emplace_back(hbox(text("   "),bgcolor(Color::Green, text("    "))));
+                piece.emplace_back(hbox(text("     "),bgcolor(Color::Green, text("  "))));
+                break;
+            case CYAN:
+                piece.emplace_back(separatorEmpty());
+                piece.emplace_back(hbox(text(" "),bgcolor(Color::Cyan, text("        "))));
+                piece.emplace_back(separatorEmpty());
+                break;
+            case VIOLET:
+                piece.emplace_back(hbox(text("   "),bgcolor(Color::Magenta, text("  "))));
+                piece.emplace_back(hbox(text("   "),bgcolor(Color::Magenta, text("    "))));
+                piece.emplace_back(hbox(text("   "),bgcolor(Color::Magenta, text("  "))));
+                break;
+            case BLUE:
+                piece.emplace_back(hbox(text("   "),bgcolor(Color::Blue, text("    "))));
+                piece.emplace_back(hbox(text("   "),bgcolor(Color::Blue, text("  "))));
+                piece.emplace_back(hbox(text("   "),bgcolor(Color::Blue, text("  "))));
+                break;
+        }
+        piece.emplace_back(separatorEmpty());
+        piecesCol.emplace_back(vbox(piece));
+        piece.clear();
+    }
+
+
+    return window(text("NEXT") | hcenter | bold,
+                  vbox(piecesCol)) |
+           size(WIDTH, EQUAL, 12) | size(HEIGHT, EQUAL, 17);
+}
+
 //============//Display//============//
 void display::gameDisplay() {
     using namespace ftxui;
-    /*
-    auto pieceDisplayTest = hbox({
-        heldPieceDisplay(RED),
-        heldPieceDisplay(WHITE),
-        heldPieceDisplay(YELLOW),
-        heldPieceDisplay(GREEN),
-        heldPieceDisplay(BLUE),
-        heldPieceDisplay(VIOLET),
-    });
-    */
 
     auto info = vbox({
         separatorEmpty(),
         separatorEmpty(),
         separatorEmpty(),
-        heldPieceDisplay(CYAN),
+        heldPieceDisplay(game.getHeldColor(), game.getIsHoldingPiece()),
         separatorEmpty(),
-        gameInfoDisplay(1, 0.8, 420, 69)
+        gameInfoDisplay(game.getLevel(), 0.8, game.getScore(), game.getClearedLines())
     });
 
     auto board= vbox({
         gameBoardDisplay()
     });
 
+    auto next = vbox({
+        separatorEmpty(),
+        separatorEmpty(),
+        separatorEmpty(),
+        nextPiecesDisplay(game.getNextPieces()),
+    });
+
     auto result = hbox({
+        separatorEmpty(),
         info,
         separatorEmpty(),
         separatorEmpty(),
         separatorEmpty(),
         board,
+        separatorEmpty(),
+        separatorEmpty(),
+        separatorEmpty(),
+        next,
     });
+
     std::string reset_position;
     auto screen = Screen::Create(Dimension::Full());
     Render(screen, result);
@@ -195,5 +256,8 @@ void display::gameDisplay() {
         screen.Print();
         reset_position = screen.ResetPosition();
     }
+
 }
+
+
 

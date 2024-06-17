@@ -26,9 +26,10 @@ public:
 
 
     //======//Elements//======//
-    static ftxui::Element heldPieceDisplay(enum color pieceColor);
+    static ftxui::Element heldPieceDisplay(enum color pieceColor, bool isHoldingPiece);
     static ftxui::Element gameInfoDisplay(unsigned int level, float levelProgress, unsigned int score, unsigned short lines);
     ftxui::Element gameBoardDisplay();
+    static ftxui::Element nextPiecesDisplay(std::vector<enum color> nextColors);
 
     //======//Display//======//
     void gameDisplay();

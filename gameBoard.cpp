@@ -5,7 +5,10 @@
 #include "gameBoard.h"
 
 gameBoard::gameBoard(unsigned short level): level(level) {
-
+    score = 0;
+    clearedLines = 0;
+    nextPieces.resize(3);
+    isHoldingPiece = false;
 }
 
 //============//Debug//============//
@@ -69,6 +72,72 @@ void gameBoard::setBoardEmpty() {
     }
 }
 
+void gameBoard::generateNextPiece() {
+    nextPieces[0] = nextPieces [1];
+    nextPieces[1] = nextPieces [2];
+    switch (rand()%7) {
+        case 0:
+            nextPieces[2] = RED;
+            break;
+        case 1:
+            nextPieces[2] = WHITE;
+            break;
+        case 2:
+            nextPieces[2] = YELLOW;
+            break;
+        case 3:
+            nextPieces[2] = GREEN;
+            break;
+        case 4:
+            nextPieces[2] = CYAN;
+            break;
+        case 5:
+            nextPieces[2] = BLUE;
+            break;
+        case 6:
+            nextPieces[2] = VIOLET;
+            break;
+    }
+}
+
+int gameBoard::spawnCurrentPiece(enum color pieceColor) {
+    switch(pieceColor){
+        case RED:
+            nextPieces[2] = RED;
+            break;
+        case WHITE:
+            nextPieces[2] = WHITE;
+            break;
+        case YELLOW:
+            currentPiece.positions[0] = position(1,4);
+            currentPiece.positions[1] = position(1,5);
+            currentPiece.positions[2] = position(2,4);
+            currentPiece.positions[3] = position(2,5);
+            break;
+        case GREEN:
+            nextPieces[2] = GREEN;
+            break;
+        case CYAN:
+            nextPieces[2] = CYAN;
+            break;
+        case BLUE:
+            nextPieces[2] = BLUE;
+            break;
+        case VIOLET:
+            nextPieces[2] = VIOLET;
+            break;
+    }
+
+
+
+    //All good
+    for(int i = 0; i < 4; i++){
+        board[currentPiece.positions[i].y][currentPiece.positions[i].x].tileColor = pieceColor;
+        board[currentPiece.positions[i].y][currentPiece.positions[i].x].isEmpty = false;
+    }
+    return 0;
+}
+
 
 //============//Getters//============//
 bool gameBoard::isEmpty(int y, int x) {
@@ -78,3 +147,32 @@ bool gameBoard::isEmpty(int y, int x) {
 enum color gameBoard::getColor(int y, int x) {
     return board[y][x].tileColor;
 }
+
+unsigned short gameBoard::getLevel() const {
+    return level;
+}
+
+unsigned short gameBoard::getClearedLines() const {
+    return clearedLines;
+}
+
+unsigned int gameBoard::getScore() const {
+    return score;
+}
+
+enum color gameBoard::getHeldColor() const {
+    return heldPiece;
+}
+
+bool gameBoard::getIsHoldingPiece() const {
+    return isHoldingPiece;
+}
+
+std::vector<enum color> gameBoard::getNextPieces() const {
+    return nextPieces;
+}
+
+
+
+
+

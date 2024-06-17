@@ -15,9 +15,12 @@
 class gameBoard {
     gameTile board[21][10];
     piece currentPiece;
-    piece heldPiece;
+    bool isHoldingPiece;
+    enum color heldPiece;
+    std::vector<enum color> nextPieces;
     unsigned short level;
-    int score;
+    unsigned short clearedLines;
+    unsigned int score;
 
 public:
     gameBoard(unsigned short level);
@@ -28,10 +31,19 @@ public:
 
     //======//Functions//======//
     void setBoardEmpty();
+    void generateNextPiece();
+    int spawnCurrentPiece(enum color pieceColor);
 
     //======//Getters//======//
     bool isEmpty(int y, int x);
     enum color getColor(int y, int x);
+    unsigned short getLevel() const;
+    unsigned short getClearedLines() const;
+    unsigned int getScore() const;
+    enum color getHeldColor() const;
+    bool getIsHoldingPiece() const;
+    std::vector<enum color> getNextPieces() const;
+
 };
 
 

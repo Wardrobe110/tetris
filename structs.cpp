@@ -18,18 +18,20 @@ x(x), y(y) {
 
 }
 
+position::position() {
+    x = -1;
+    y = -1;
+}
+
 //============//Piece//============//
 
 piece::piece() {
-    pos1 = nullptr;
-    pos2 = nullptr;
-    pos3 = nullptr;
-    pos4 = nullptr;
+    positions.resize(4);
 }
 
 
-piece::piece(position *pos1, position *pos2, position *pos3, position *pos4, enum color color):
-        pos1(pos1), pos2(pos2), pos3(pos3), pos4(pos4), pieceColor(color) {
+//piece::piece(position pos1, position pos2, position pos3, position pos4, enum color color):
+ //       pos1(pos1), pos2(pos2), pos3(pos3), pos4(pos4), pieceColor(color) {
 
-}
+//}
 

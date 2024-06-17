@@ -5,6 +5,8 @@
 #ifndef TETRIS_STRUCTS_H
 #define TETRIS_STRUCTS_H
 
+#include <vector>
+
 enum color{
     RED,
     WHITE,  //Typically orange
@@ -26,19 +28,16 @@ struct position{
     unsigned short x;
     unsigned short y;
 
+    position();
     explicit position(unsigned short y, unsigned short x);
 };
 
 struct piece {
-    position *pos1;
-    position *pos2;
-    position *pos3;
-    position *pos4;
-
+    std::vector<position> positions;
     color pieceColor;
 
     piece();
-    explicit piece(position *pos1, position *pos2, position *pos3, position *pos4, enum color bro);
+    //explicit piece(position pos1, position pos2, position pos3, position pos4, enum color bro);
 };
 
 
