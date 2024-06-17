@@ -43,6 +43,9 @@ void gameBoard::debugDisplay() {
                     case VIOLET:
                         std::cout<<"V";
                         break;
+                    case CYAN:
+                        std::cout<<"C";
+                        break;
                 }
                 std::cout<<"]";
             }

@@ -4,9 +4,12 @@
 
 #ifndef TETRIS_GAMEBOARD_H
 #define TETRIS_GAMEBOARD_H
+
+#include <vector>
 #include "structs.h"
 #include "iostream"
 #include "iomanip"
+#include "ftxui/screen/color.hpp"
 
 
 class gameBoard {
@@ -27,8 +30,8 @@ public:
     void setBoardEmpty();
 
     //======//Getters//======//
-    inline bool isEmpty(int y, int x);
-    inline enum color getColor(int y, int x);
+    bool isEmpty(int y, int x);
+    enum color getColor(int y, int x);
 };
 
 

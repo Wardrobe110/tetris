@@ -11,7 +11,8 @@ enum color{
     YELLOW,
     GREEN,
     BLUE,
-    VIOLET
+    VIOLET,
+    CYAN
 };
 
 struct gameTile{

@@ -2,34 +2,37 @@
 // Created by hubert on 6/16/24.
 //
 
-#ifndef FTXUI_TEST_GAMEDEBUGDISPLAY_H
-#define FTXUI_TEST_GAMEDEBUGDISPLAY_H
+#ifndef FTXUI_TEST_DISPLAY_H
+#define FTXUI_TEST_DISPLAY_H
 #include "gameBoard.h"
 #include <cstdio>                 // for getchar
 #include <ftxui/dom/elements.hpp>  // for operator|, size, Element, text, hcenter, Decorator, Fit, WIDTH, hflow, window, EQUAL, GREATER_THAN, HEIGHT, bold, border, dim, LESS_THAN
 #include <ftxui/screen/screen.hpp>  // for Full, Screen
 #include <string>  // for allocator, char_traits, operator+, to_string, string
-
+#include <cmath>
 
 #include "ftxui/dom/node.hpp"      // for Render
 #include "ftxui/screen/color.hpp"
+#include "ftxui/screen/color_info.hpp"
 
-class gameDebugDisplay {
+class display {
     gameBoard &game;
 
 public:
     //======//Debug//======//
-    explicit gameDebugDisplay(gameBoard &game);
+    explicit display(gameBoard &game);
+
+
 
 
     //======//Elements//======//
     static ftxui::Element heldPieceDisplay(enum color pieceColor);
     static ftxui::Element gameInfoDisplay(unsigned int level, float levelProgress, unsigned int score, unsigned short lines);
-    static ftxui::Element gameBoardDisplay();
+    ftxui::Element gameBoardDisplay();
 
     //======//Display//======//
-    static void gameDisplay();
+    void gameDisplay();
 };
 
 
-#endif //FTXUI_TEST_GAMEDEBUGDISPLAY_H
+#endif //FTXUI_TEST_DISPLAY_H

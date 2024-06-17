@@ -2,15 +2,16 @@
 // Created by hubert on 6/16/24.
 //
 
-#include "gameDebugDisplay.h"
+#include "display.h"
 #include "ftxui/component/screen_interactive.hpp"
 
 
-gameDebugDisplay::gameDebugDisplay(gameBoard &game): game(game) {
+display::display(gameBoard &game): game(game) {
 
 }
 
-ftxui::Element gameDebugDisplay::heldPieceDisplay(enum color pieceColor) {
+//============//Elements//============//
+ftxui::Element display::heldPieceDisplay(enum color pieceColor) {
     using namespace ftxui;
     auto makeBoxHold = [](enum color pieceColor) {
         auto pieceShape = vbox();
@@ -47,11 +48,11 @@ ftxui::Element gameDebugDisplay::heldPieceDisplay(enum color pieceColor) {
                         hbox(text("   "),bgcolor(Color::Green, text("  ")))
                 );
                 break;
-            case BLUE:
+            case CYAN:
                 pieceShape = vbox(
                         separatorEmpty(),
                         separatorEmpty(),
-                        bgcolor(Color::Blue, text("        "))
+                        bgcolor(Color::Cyan, text("        "))
                 );
                 break;
             case VIOLET:
@@ -62,6 +63,13 @@ ftxui::Element gameDebugDisplay::heldPieceDisplay(enum color pieceColor) {
                         hbox(text(" "),bgcolor(Color::Magenta, text("  ")))
                 );
                 break;
+            case BLUE:
+                pieceShape = vbox(
+                        separatorEmpty(),
+                        hbox(text(" "),bgcolor(Color::Blue, text("    "))),
+                        hbox(text(" "),bgcolor(Color::Blue, text("  "))),
+                        hbox(text(" "),bgcolor(Color::Blue, text("  ")))
+                );
         }
         return window(text("HOLD") | hcenter | bold,
                       pieceShape | hcenter ) |
@@ -71,11 +79,12 @@ ftxui::Element gameDebugDisplay::heldPieceDisplay(enum color pieceColor) {
 
 }
 
-ftxui::Element gameDebugDisplay::gameInfoDisplay(unsigned int level, float levelProgress, unsigned int score, unsigned short lines) {
+
+ftxui::Element display::gameInfoDisplay(unsigned int level, float levelProgress, unsigned int score, unsigned short lines) {
     using namespace ftxui;
 
     return hbox({
-        separatorEmpty(),
+        //eparatorEmpty(),
         separatorEmpty(),
         vbox({
             window(text("LEVEL") | hcenter | bold,
@@ -101,12 +110,51 @@ ftxui::Element gameDebugDisplay::gameInfoDisplay(unsigned int level, float level
 
 }
 
-ftxui::Element gameDebugDisplay::gameBoardDisplay() {
-    return ftxui::Element();
+ftxui::Element display::gameBoardDisplay() {
+    using namespace ftxui;
+    const char *block = "    ";
+    std::vector<Element> elementsLine;
+    std::vector<Element> elementsGrid;
+
+    for(int i = 1; i < 21; i++) {
+        for (int j = 0; j < 10; j++) {
+            if (game.isEmpty(i, j)) {
+                elementsLine.emplace_back(text(block));
+            } else {
+                switch (game.getColor(i, j)) {
+                    case RED:
+                        elementsLine.emplace_back(bgcolor(Color::Red, text(block)));
+                        break;
+                    case WHITE:
+                        elementsLine.emplace_back(bgcolor(Color::White, text(block)));
+                        break;
+                    case YELLOW:
+                        elementsLine.emplace_back(bgcolor(Color::Yellow, text(block)));
+                        break;
+                    case GREEN:
+                        elementsLine.emplace_back(bgcolor(Color::Green, text(block)));
+                        break;
+                    case BLUE:
+                        elementsLine.emplace_back(bgcolor(Color::Blue, text(block)));
+                        break;
+                    case VIOLET:
+                        elementsLine.emplace_back(bgcolor(Color::Violet, text(block)));
+                        break;
+                    case CYAN:
+                        elementsLine.emplace_back(bgcolor(Color::Cyan, text(block)));
+                        break;
+                }
+            }
+        }
+        elementsGrid.emplace_back(hbox(elementsLine) | size(HEIGHT, EQUAL, 2));
+        //elementsGrid.emplace_back(hbox(elementsLine));
+        elementsLine.clear();
+    }
+    return vbox(elementsGrid) | border | size(WIDTH, EQUAL, 42) | size(HEIGHT, EQUAL, 42);
 }
 
 //============//Display//============//
-void gameDebugDisplay::gameDisplay() {
+void display::gameDisplay() {
     using namespace ftxui;
     /*
     auto pieceDisplayTest = hbox({
@@ -119,16 +167,33 @@ void gameDebugDisplay::gameDisplay() {
     });
     */
 
-    auto result = vbox({
-        heldPieceDisplay(RED),
+    auto info = vbox({
+        separatorEmpty(),
+        separatorEmpty(),
+        separatorEmpty(),
+        heldPieceDisplay(CYAN),
         separatorEmpty(),
         gameInfoDisplay(1, 0.8, 420, 69)
     });
 
+    auto board= vbox({
+        gameBoardDisplay()
+    });
 
-    auto screen = Screen::Create(Dimension::Full(), Dimension::Fit(result));
+    auto result = hbox({
+        info,
+        separatorEmpty(),
+        separatorEmpty(),
+        separatorEmpty(),
+        board,
+    });
+    std::string reset_position;
+    auto screen = Screen::Create(Dimension::Full());
     Render(screen, result);
-    screen.Print();
+    while(1) {
+        std::cout << reset_position;
+        screen.Print();
+        reset_position = screen.ResetPosition();
+    }
 }
-
 

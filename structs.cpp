@@ -21,7 +21,10 @@ x(x), y(y) {
 //============//Piece//============//
 
 piece::piece() {
-
+    pos1 = nullptr;
+    pos2 = nullptr;
+    pos3 = nullptr;
+    pos4 = nullptr;
 }
 
 

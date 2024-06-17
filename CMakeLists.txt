@@ -25,8 +25,8 @@ add_executable(tetris main.cpp
         gameBoard.h
         structs.cpp
         structs.h
-        gameDebugDisplay.cpp
-        gameDebugDisplay.h
+        display.cpp
+        display.h
 )
 
 target_link_libraries(tetris
