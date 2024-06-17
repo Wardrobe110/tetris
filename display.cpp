@@ -81,11 +81,6 @@ ftxui::Element gameDebugDisplay::gameInfoDisplay(unsigned int level, float level
             window(text("LEVEL") | hcenter | bold,
                    text(std::to_string(level)) | hcenter ) |
                    size(WIDTH, EQUAL, 8) | size(HEIGHT, EQUAL, 3),
-            separatorEmpty(),
-
-            hbox({
-                text("PROGRESS")
-            }) | border | size(WIDTH, EQUAL, 8),
             hbox({
                 separatorEmpty(),
                 separatorEmpty(),
@@ -106,6 +101,11 @@ ftxui::Element gameDebugDisplay::gameInfoDisplay(unsigned int level, float level
 
 }
 
+ftxui::Element gameDebugDisplay::gameBoardDisplay() {
+    return ftxui::Element();
+}
+
+//============//Display//============//
 void gameDebugDisplay::gameDisplay() {
     using namespace ftxui;
     /*
@@ -121,7 +121,7 @@ void gameDebugDisplay::gameDisplay() {
 
     auto result = vbox({
         heldPieceDisplay(RED),
-
+        separatorEmpty(),
         gameInfoDisplay(1, 0.8, 420, 69)
     });
 
@@ -130,3 +130,5 @@ void gameDebugDisplay::gameDisplay() {
     Render(screen, result);
     screen.Print();
 }
+
+
