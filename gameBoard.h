@@ -37,13 +37,15 @@ public:
     void generateNextPiece();
     int spawnCurrentPiece(enum color pieceColor);
     void updateLevel();
-    bool movePieceRight();
-    bool movePieceLeft();
+    bool movePieceRight();  //1 - success; 0 - failure
+    bool movePieceLeft();   //1 - success; 0 - failure
+    bool movePieceDown();   //1 - success; 0 - failure
+    bool holdPiece();       //1 - success; 0 - failure
 
     //======//Helpers//======//
     bool movePieceUp();
     bool canPlacePiece();
-
+    void updateLevelProgress();
 
     //======//Getters//======//
     bool isEmpty(int y, int x);

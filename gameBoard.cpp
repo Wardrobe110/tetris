@@ -7,7 +7,7 @@
 
 gameBoard::gameBoard(unsigned short level, bool scoringTypeFixed): level(level), isScoringTypeFixed(scoringTypeFixed) {
     score = 0;
-    clearedLines = 0;
+    clearedLines = 30;
     nextPieces.resize(3);
     isHoldingPiece = false;
     levelProgress = 0;
@@ -75,6 +75,7 @@ void gameBoard::setBoardEmpty() {
 }
 
 void gameBoard::generateNextPiece() {
+    //TODO BAG GRAB GENERATOR
     nextPieces[0] = nextPieces [1];
     nextPieces[1] = nextPieces [2];
     switch (rand()%7) {
@@ -168,20 +169,32 @@ int gameBoard::spawnCurrentPiece(enum color pieceColor) {
 void gameBoard::updateLevel() {
     if(isScoringTypeFixed){
         level = floor(clearedLines/10);
-        levelProgress = (clearedLines%10)/10;
+        //levelProgress = (clearedLines%10)/10;
     }else{
-        //
+        //TODO FIX VARIABLE TYPE GOAL
+        if(clearedLines >= 5 * level and clearedLines <= 600) level++;
     }
 }
 
 bool gameBoard::movePieceRight() {
+    bool pieceFlag = false;
+
     //Check if you can move piece
     for(int i = 0; i < 4; i++){
         if(currentPiece.positions[i].x == 9){
             return false;
-        }//else if(currentPiece.positions[i].x > maxRight){
-
-        //}
+        }else{
+            pieceFlag = false;
+            if(!isEmpty(currentPiece.positions[i].y, currentPiece.positions[i].x + 1)){
+                for(int j = 0; j < 4; j++){
+                    if(currentPiece.positions[j].y == currentPiece.positions[i].y and currentPiece.positions[j].x == currentPiece.positions[i].x + 1){
+                        pieceFlag = true;
+                        break;
+                    }
+                }
+                if(pieceFlag == false) return false;
+            }
+        }
     }
 
 
@@ -199,15 +212,37 @@ bool gameBoard::movePieceRight() {
 }
 
 bool gameBoard::movePieceLeft() {
+    bool pieceFlag = false;
+
+    //Check if you can move piece
     for(int i = 0; i < 4; i++){
         if(currentPiece.positions[i].x == 0){
             return false;
+        }else{
+            pieceFlag = false;
+            if(!isEmpty(currentPiece.positions[i].y, currentPiece.positions[i].x - 1)){
+                for(int j = 0; j < 4; j++){
+                    if(currentPiece.positions[j].y == currentPiece.positions[i].y and currentPiece.positions[j].x == currentPiece.positions[i].x - 1){
+                        pieceFlag = true;
+                        break;
+                    }
+                }
+                if(pieceFlag == false) return false;
+            }
         }
     }
 
+
+    //Move piece
     for(int i = 0; i < 4; i++){
-        currentPiece.positions[i].x -= 1;
+        board[currentPiece.positions[i].y][currentPiece.positions[i].x].isEmpty = true;
+        currentPiece.positions[i].x -=1;
     }
+    for(int i = 0; i < 4; i++){
+        board[currentPiece.positions[i].y][currentPiece.positions[i].x].isEmpty = false;
+        board[currentPiece.positions[i].y][currentPiece.positions[i].x].tileColor = currentPiece.pieceColor;
+    }
+
     return true;
 }
 
