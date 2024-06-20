@@ -6,6 +6,7 @@
 #define TETRIS_GAMEBOARD_H
 
 #include <vector>
+#include <cmath>
 #include "structs.h"
 #include "iostream"
 #include "iomanip"
@@ -21,9 +22,11 @@ class gameBoard {
     unsigned short level;
     unsigned short clearedLines;
     unsigned int score;
+    float levelProgress;
+    bool isScoringTypeFixed;
 
 public:
-    gameBoard(unsigned short level);
+    gameBoard(unsigned short level, bool scoringTypeFixed);
 
     //======//Debug//======//
     void debugDisplay();
@@ -33,6 +36,14 @@ public:
     void setBoardEmpty();
     void generateNextPiece();
     int spawnCurrentPiece(enum color pieceColor);
+    void updateLevel();
+    bool movePieceRight();
+    bool movePieceLeft();
+
+    //======//Helpers//======//
+    bool movePieceUp();
+    bool canPlacePiece();
+
 
     //======//Getters//======//
     bool isEmpty(int y, int x);
@@ -43,6 +54,7 @@ public:
     enum color getHeldColor() const;
     bool getIsHoldingPiece() const;
     std::vector<enum color> getNextPieces() const;
+    float getLevelProgress() const;
 
 };
 

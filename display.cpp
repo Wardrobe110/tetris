@@ -251,11 +251,7 @@ void display::gameDisplay() {
     std::string reset_position;
     auto screen = Screen::Create(Dimension::Full());
     Render(screen, result);
-    while(1) {
-        std::cout << reset_position;
-        screen.Print();
-        reset_position = screen.ResetPosition();
-    }
+    screen.Print();
 
 }
 

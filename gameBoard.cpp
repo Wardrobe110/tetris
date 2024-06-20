@@ -2,13 +2,15 @@
 // Created by hubert on 6/15/24.
 //
 
+
 #include "gameBoard.h"
 
-gameBoard::gameBoard(unsigned short level): level(level) {
+gameBoard::gameBoard(unsigned short level, bool scoringTypeFixed): level(level), isScoringTypeFixed(scoringTypeFixed) {
     score = 0;
     clearedLines = 0;
     nextPieces.resize(3);
     isHoldingPiece = false;
+    levelProgress = 0;
 }
 
 //============//Debug//============//
@@ -101,12 +103,20 @@ void gameBoard::generateNextPiece() {
 }
 
 int gameBoard::spawnCurrentPiece(enum color pieceColor) {
+
+    currentPiece.pieceColor = pieceColor;
     switch(pieceColor){
         case RED:
-            nextPieces[2] = RED;
+            currentPiece.positions[0] = position(1,3);
+            currentPiece.positions[1] = position(2,4);
+            currentPiece.positions[2] = position(2,5);
+            currentPiece.positions[3] = position(1,4);
             break;
         case WHITE:
-            nextPieces[2] = WHITE;
+            currentPiece.positions[0] = position(2,3);
+            currentPiece.positions[1] = position(2,4);
+            currentPiece.positions[2] = position(2,5);
+            currentPiece.positions[3] = position(1,5);
             break;
         case YELLOW:
             currentPiece.positions[0] = position(1,4);
@@ -115,20 +125,37 @@ int gameBoard::spawnCurrentPiece(enum color pieceColor) {
             currentPiece.positions[3] = position(2,5);
             break;
         case GREEN:
-            nextPieces[2] = GREEN;
+            currentPiece.positions[0] = position(2,3);
+            currentPiece.positions[1] = position(2,4);
+            currentPiece.positions[2] = position(1,5);
+            currentPiece.positions[3] = position(1,4);
             break;
         case CYAN:
-            nextPieces[2] = CYAN;
+            currentPiece.positions[0] = position(2,3);
+            currentPiece.positions[1] = position(2,4);
+            currentPiece.positions[2] = position(2,5);
+            currentPiece.positions[3] = position(2,6);
             break;
         case BLUE:
-            nextPieces[2] = BLUE;
+            currentPiece.positions[0] = position(2,3);
+            currentPiece.positions[1] = position(2,4);
+            currentPiece.positions[2] = position(2,5);
+            currentPiece.positions[3] = position(1,3);
             break;
         case VIOLET:
-            nextPieces[2] = VIOLET;
+            currentPiece.positions[0] = position(2,3);
+            currentPiece.positions[1] = position(2,4);
+            currentPiece.positions[2] = position(2,5);
+            currentPiece.positions[3] = position(1,4);
             break;
     }
 
-
+    //Check if you can spawn it
+    while(canPlacePiece() == false){
+        if(movePieceUp() == false) {
+            return -1;
+        }
+    }
 
     //All good
     for(int i = 0; i < 4; i++){
@@ -137,6 +164,81 @@ int gameBoard::spawnCurrentPiece(enum color pieceColor) {
     }
     return 0;
 }
+
+void gameBoard::updateLevel() {
+    if(isScoringTypeFixed){
+        level = floor(clearedLines/10);
+        levelProgress = (clearedLines%10)/10;
+    }else{
+        //
+    }
+}
+
+bool gameBoard::movePieceRight() {
+    //Check if you can move piece
+    for(int i = 0; i < 4; i++){
+        if(currentPiece.positions[i].x == 9){
+            return false;
+        }//else if(currentPiece.positions[i].x > maxRight){
+
+        //}
+    }
+
+
+    //Move piece
+    for(int i = 0; i < 4; i++){
+        board[currentPiece.positions[i].y][currentPiece.positions[i].x].isEmpty = true;
+        currentPiece.positions[i].x +=1;
+    }
+    for(int i = 0; i < 4; i++){
+        board[currentPiece.positions[i].y][currentPiece.positions[i].x].isEmpty = false;
+        board[currentPiece.positions[i].y][currentPiece.positions[i].x].tileColor = currentPiece.pieceColor;
+    }
+
+    return true;
+}
+
+bool gameBoard::movePieceLeft() {
+    for(int i = 0; i < 4; i++){
+        if(currentPiece.positions[i].x == 0){
+            return false;
+        }
+    }
+
+    for(int i = 0; i < 4; i++){
+        currentPiece.positions[i].x -= 1;
+    }
+    return true;
+}
+
+//============//Helpers//============//
+bool gameBoard::movePieceUp() {
+    for(int i = 0; i < 4; i++){
+
+        if(currentPiece.pieceColor == CYAN and currentPiece.positions[i].y == 1){
+            return false;
+        }
+        if(currentPiece.positions[i].y == 0){
+            return false;
+        }
+    }
+
+    for(int i = 0; i < 4; i++){
+        currentPiece.positions[i].y -= 1;
+    }
+    return true;
+}
+
+bool gameBoard::canPlacePiece() {
+
+    for(int i = 0; i < 4; i++){
+        if(!isEmpty(currentPiece.positions[i].y, currentPiece.positions[i].x)){
+            return false;
+        }
+    }
+    return true;
+}
+
 
 
 //============//Getters//============//
@@ -171,6 +273,17 @@ bool gameBoard::getIsHoldingPiece() const {
 std::vector<enum color> gameBoard::getNextPieces() const {
     return nextPieces;
 }
+
+float gameBoard::getLevelProgress() const {
+    return levelProgress;
+}
+
+
+
+
+
+
+
 
 
 
