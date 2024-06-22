@@ -6,7 +6,7 @@
 #define FTXUI_TEST_DISPLAY_H
 #include "gameBoard.h"
 #include <cstdio>                 // for getchar
-#include <ftxui/dom/elements.hpp>  // for operator|, size, Element, text, hcenter, Decorator, Fit, WIDTH, hflow, window, EQUAL, GREATER_THAN, HEIGHT, bold, border, dim, LESS_THAN
+#include <ftxui/dom/elements.hpp>  // for operator|, size, Element, text, hcenter, Decorator, Fit, BOARD_WIDTH, hflow, window, EQUAL, GREATER_THAN, BOARD_HEIGHT, bold, border, dim, LESS_THAN
 #include <ftxui/screen/screen.hpp>  // for Full, Screen
 #include <string>  // for allocator, char_traits, operator+, to_string, string
 #include <cmath>

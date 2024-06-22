@@ -13,8 +13,12 @@
 #include "ftxui/screen/color.hpp"
 
 
+constexpr unsigned short BOARD_HEIGHT = 21;
+constexpr unsigned short BOARD_WIDTH = 10;
+const unsigned short PIECE_SEGMENTS = 4;
+
 class gameBoard {
-    gameTile board[21][10];
+    gameTile board[BOARD_HEIGHT][BOARD_WIDTH];
     piece currentPiece;
     bool isHoldingPiece;
     enum color heldPiece;
@@ -24,6 +28,7 @@ class gameBoard {
     unsigned int score;
     float levelProgress;
     bool isScoringTypeFixed;
+    bool heldPieceThisTurn;
 
 public:
     gameBoard(unsigned short level, bool scoringTypeFixed);
@@ -37,15 +42,17 @@ public:
     void generateNextPiece();
     int spawnCurrentPiece(enum color pieceColor);
     void updateLevel();
-    bool movePieceRight();  //1 - success; 0 - failure
-    bool movePieceLeft();   //1 - success; 0 - failure
-    bool movePieceDown();   //1 - success; 0 - failure
-    bool holdPiece();       //1 - success; 0 - failure
+    void updateLevelProgress();
+    int movePiece(short dy, short dx);
+    int holdPiece();
+    int clearLines();
+    int rotatePiece(int degrees);
 
     //======//Helpers//======//
     bool movePieceUp();
     bool canPlacePiece();
-    void updateLevelProgress();
+    unsigned short sumUpTo(unsigned  short x);
+    std::vector<unsigned short > findCompleteLines();
 
     //======//Getters//======//
     bool isEmpty(int y, int x);

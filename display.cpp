@@ -221,7 +221,7 @@ void display::gameDisplay() {
         separatorEmpty(),
         heldPieceDisplay(game.getHeldColor(), game.getIsHoldingPiece()),
         separatorEmpty(),
-        gameInfoDisplay(game.getLevel(), 0.8, game.getScore(), game.getClearedLines())
+        gameInfoDisplay(game.getLevel(), game.getLevelProgress(), game.getScore(), game.getClearedLines())
     });
 
     auto board= vbox({

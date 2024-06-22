@@ -7,23 +7,24 @@
 
 gameBoard::gameBoard(unsigned short level, bool scoringTypeFixed): level(level), isScoringTypeFixed(scoringTypeFixed) {
     score = 0;
-    clearedLines = 30;
+    clearedLines = 0;
     nextPieces.resize(3);
     isHoldingPiece = false;
     levelProgress = 0;
+    heldPieceThisTurn = false;
 }
 
 //============//Debug//============//
 
 void gameBoard::debugDisplay() {
     std::cout<<"     ";
-    for(int i = 0; i < 10; i++){
+    for(int i = 0; i < BOARD_WIDTH; i++){
         std::cout<<" "<<i<<"  ";
     }
     std::cout<<std::endl;
-    for(int i = 0; i < 21; i++){
+    for(int i = 0; i < BOARD_HEIGHT; i++){
         std::cout<<std::setw(2)<<i<<"  |";
-        for(int j = 0; j < 10; j++){
+        for(int j = 0; j < BOARD_WIDTH; j++){
             //Could probably make it into separate function
             if(isEmpty(i,j)){
                 std::cout<<"   ";
@@ -67,8 +68,8 @@ void gameBoard::debugSetTile(int y, int x, bool empty, enum color color) {
 
 //============//Functions//============//
 void gameBoard::setBoardEmpty() {
-    for(int i = 0; i < 21; i++){
-        for(int j = 0; j < 10; j++) {
+    for(int i = 0; i < BOARD_HEIGHT; i++){
+        for(int j = 0; j < BOARD_WIDTH; j++) {
             board[i][j].isEmpty = true;
         }
     }
@@ -159,96 +160,123 @@ int gameBoard::spawnCurrentPiece(enum color pieceColor) {
     }
 
     //All good
-    for(int i = 0; i < 4; i++){
+    for(int i = 0; i < PIECE_SEGMENTS; i++){
         board[currentPiece.positions[i].y][currentPiece.positions[i].x].tileColor = pieceColor;
         board[currentPiece.positions[i].y][currentPiece.positions[i].x].isEmpty = false;
     }
+    heldPieceThisTurn = false;
     return 0;
 }
 
 void gameBoard::updateLevel() {
     if(isScoringTypeFixed){
-        level = floor(clearedLines/10);
+        if(clearedLines%10 == 0) level++;
         //levelProgress = (clearedLines%10)/10;
     }else{
-        //TODO FIX VARIABLE TYPE GOAL
-        if(clearedLines >= 5 * level and clearedLines <= 600) level++;
+        if(clearedLines - 5*(sumUpTo(level - 1))>= 5 * level and clearedLines <= 600) level++;
+        //levelProgress = clearedLines - 5*(sumUpTo(level - 1))/5 * level;
     }
 }
 
-bool gameBoard::movePieceRight() {
+void gameBoard::updateLevelProgress() {
+
+    if(isScoringTypeFixed){
+        levelProgress = (clearedLines%10) / 10.0;
+    }else{
+        levelProgress = (static_cast<float>(clearedLines - 5 * sumUpTo(level - 1))) / (5.0 * level);
+    }
+}
+
+int gameBoard::movePiece(short dy, short dx) {
     bool pieceFlag = false;
 
     //Check if you can move piece
-    for(int i = 0; i < 4; i++){
+    if(dy < 0) return false;
+    for(int i = 0; i < PIECE_SEGMENTS; i++){
         if(currentPiece.positions[i].x == 9){
-            return false;
+            return -1;
         }else{
             pieceFlag = false;
-            if(!isEmpty(currentPiece.positions[i].y, currentPiece.positions[i].x + 1)){
-                for(int j = 0; j < 4; j++){
-                    if(currentPiece.positions[j].y == currentPiece.positions[i].y and currentPiece.positions[j].x == currentPiece.positions[i].x + 1){
+            if(!isEmpty(currentPiece.positions[i].y + dy, currentPiece.positions[i].x + dx)){
+                for(int j = 0; j < PIECE_SEGMENTS; j++){
+                    if(currentPiece.positions[j].y == currentPiece.positions[i].y + dy and currentPiece.positions[j].x == currentPiece.positions[i].x + dx){
                         pieceFlag = true;
                         break;
                     }
                 }
-                if(pieceFlag == false) return false;
+                if(pieceFlag == false) return -1;
             }
         }
     }
 
 
     //Move piece
-    for(int i = 0; i < 4; i++){
+    for(int i = 0; i < PIECE_SEGMENTS; i++){
         board[currentPiece.positions[i].y][currentPiece.positions[i].x].isEmpty = true;
-        currentPiece.positions[i].x +=1;
+        currentPiece.positions[i].x += dx;
+        currentPiece.positions[i].y += dy;
     }
-    for(int i = 0; i < 4; i++){
+    for(int i = 0; i < PIECE_SEGMENTS; i++){
         board[currentPiece.positions[i].y][currentPiece.positions[i].x].isEmpty = false;
         board[currentPiece.positions[i].y][currentPiece.positions[i].x].tileColor = currentPiece.pieceColor;
     }
 
-    return true;
+    return 1;
 }
 
-bool gameBoard::movePieceLeft() {
-    bool pieceFlag = false;
+int gameBoard::holdPiece() {
+    if(heldPieceThisTurn) return -1;
 
-    //Check if you can move piece
-    for(int i = 0; i < 4; i++){
-        if(currentPiece.positions[i].x == 0){
-            return false;
-        }else{
-            pieceFlag = false;
-            if(!isEmpty(currentPiece.positions[i].y, currentPiece.positions[i].x - 1)){
-                for(int j = 0; j < 4; j++){
-                    if(currentPiece.positions[j].y == currentPiece.positions[i].y and currentPiece.positions[j].x == currentPiece.positions[i].x - 1){
-                        pieceFlag = true;
-                        break;
-                    }
-                }
-                if(pieceFlag == false) return false;
+    for(int i = 0; i < PIECE_SEGMENTS; i++){
+        board[currentPiece.positions[i].y][currentPiece.positions[i].x].isEmpty = true;
+    }
+
+    if(isHoldingPiece){
+        enum color tmp;
+        tmp = getHeldColor();
+        heldPiece = currentPiece.pieceColor;
+        spawnCurrentPiece(tmp);
+    }else{
+        heldPiece = currentPiece.pieceColor;
+        spawnCurrentPiece(getNextPieces()[0]);
+        generateNextPiece();
+        isHoldingPiece = true;
+    }
+    heldPieceThisTurn = true;
+    return 0;
+}
+
+int gameBoard::clearLines() {
+    std::vector<unsigned short> indexes;
+    indexes = findCompleteLines();
+
+    if(indexes.size() == 0) return -1;
+
+    unsigned short scoreMult[4] = {1,3,5,8};
+
+    score += scoreMult[(indexes.size()-1)] * 100;
+
+    for(int i = 0; i < indexes.size(); i++){
+        for(int k = indexes[i]; k > 0; k--){
+            for(int l = 0; l < BOARD_WIDTH; l++){
+                board[k][l] = board[k-1][l];
             }
         }
+        clearedLines++;
     }
 
 
-    //Move piece
-    for(int i = 0; i < 4; i++){
-        board[currentPiece.positions[i].y][currentPiece.positions[i].x].isEmpty = true;
-        currentPiece.positions[i].x -=1;
-    }
-    for(int i = 0; i < 4; i++){
-        board[currentPiece.positions[i].y][currentPiece.positions[i].x].isEmpty = false;
-        board[currentPiece.positions[i].y][currentPiece.positions[i].x].tileColor = currentPiece.pieceColor;
-    }
+    return 0;
+}
 
-    return true;
+int gameBoard::rotatePiece(int degrees) {
+    //TODO MAKE IT HAPPEN
+    return 0;
 }
 
 //============//Helpers//============//
 bool gameBoard::movePieceUp() {
-    for(int i = 0; i < 4; i++){
+    for(int i = 0; i < PIECE_SEGMENTS; i++){
 
         if(currentPiece.pieceColor == CYAN and currentPiece.positions[i].y == 1){
             return false;
@@ -258,15 +286,14 @@ bool gameBoard::movePieceUp() {
         }
     }
 
-    for(int i = 0; i < 4; i++){
+    for(int i = 0; i < PIECE_SEGMENTS; i++){
         currentPiece.positions[i].y -= 1;
     }
     return true;
 }
 
 bool gameBoard::canPlacePiece() {
-
-    for(int i = 0; i < 4; i++){
+    for(int i = 0; i < PIECE_SEGMENTS; i++){
         if(!isEmpty(currentPiece.positions[i].y, currentPiece.positions[i].x)){
             return false;
         }
@@ -274,7 +301,32 @@ bool gameBoard::canPlacePiece() {
     return true;
 }
 
+unsigned short gameBoard::sumUpTo(unsigned short x) {
+    int y = 0;
+    for(int i = 1; i <= x; i++){
+        y += i;
+    }
+    return  y;
+}
 
+std::vector<unsigned short> gameBoard::findCompleteLines() {
+    std::vector<unsigned short> fullLineIndexes;
+    bool lineFullFlag = true;
+
+    for(int i = 1; i < BOARD_HEIGHT; i++){
+        lineFullFlag = true;
+        for(int j = 0; j < BOARD_WIDTH; j++){
+            if(isEmpty(i,j)) lineFullFlag = false;
+            break;
+        }
+
+        if(lineFullFlag){
+            fullLineIndexes.push_back(i);
+        }
+    }
+
+    return fullLineIndexes;
+}
 
 //============//Getters//============//
 bool gameBoard::isEmpty(int y, int x) {
@@ -312,15 +364,5 @@ std::vector<enum color> gameBoard::getNextPieces() const {
 float gameBoard::getLevelProgress() const {
     return levelProgress;
 }
-
-
-
-
-
-
-
-
-
-
 
 
