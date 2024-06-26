@@ -113,42 +113,56 @@ int gameBoard::spawnCurrentPiece(enum color pieceColor) {
             currentPiece.positions[1] = position(2,4);
             currentPiece.positions[2] = position(2,5);
             currentPiece.positions[3] = position(1,4);
+            currentPiece.originX = 4.0;
+            currentPiece.originY = 2.0;
             break;
         case WHITE:
             currentPiece.positions[0] = position(2,3);
             currentPiece.positions[1] = position(2,4);
             currentPiece.positions[2] = position(2,5);
             currentPiece.positions[3] = position(1,5);
+            currentPiece.originX = 4.0;
+            currentPiece.originY = 2.0;
             break;
         case YELLOW:
             currentPiece.positions[0] = position(1,4);
             currentPiece.positions[1] = position(1,5);
             currentPiece.positions[2] = position(2,4);
             currentPiece.positions[3] = position(2,5);
+            currentPiece.originX = 4.5;
+            currentPiece.originY = 1.5;
             break;
         case GREEN:
             currentPiece.positions[0] = position(2,3);
             currentPiece.positions[1] = position(2,4);
             currentPiece.positions[2] = position(1,5);
             currentPiece.positions[3] = position(1,4);
+            currentPiece.originX = 4.0;
+            currentPiece.originY = 2.0;
             break;
         case CYAN:
             currentPiece.positions[0] = position(2,3);
             currentPiece.positions[1] = position(2,4);
             currentPiece.positions[2] = position(2,5);
             currentPiece.positions[3] = position(2,6);
+            currentPiece.originX = 4.5;
+            currentPiece.originY = 2.5;
             break;
         case BLUE:
             currentPiece.positions[0] = position(2,3);
             currentPiece.positions[1] = position(2,4);
             currentPiece.positions[2] = position(2,5);
             currentPiece.positions[3] = position(1,3);
+            currentPiece.originX = 4.0;
+            currentPiece.originY = 2.0;
             break;
         case VIOLET:
             currentPiece.positions[0] = position(2,3);
             currentPiece.positions[1] = position(2,4);
             currentPiece.positions[2] = position(2,5);
             currentPiece.positions[3] = position(1,4);
+            currentPiece.originX = 4.0;
+            currentPiece.originY = 2.0;
             break;
     }
 
@@ -188,6 +202,7 @@ void gameBoard::updateLevelProgress() {
 }
 
 int gameBoard::movePiece(short dy, short dx) {
+    //TODO FIX MOVING OUTSIDE THE EDGE
     bool pieceFlag = false;
 
     //Check if you can move piece
@@ -216,6 +231,9 @@ int gameBoard::movePiece(short dy, short dx) {
         currentPiece.positions[i].x += dx;
         currentPiece.positions[i].y += dy;
     }
+    currentPiece.originX += dx;
+    currentPiece.originY += dy;
+
     for(int i = 0; i < PIECE_SEGMENTS; i++){
         board[currentPiece.positions[i].y][currentPiece.positions[i].x].isEmpty = false;
         board[currentPiece.positions[i].y][currentPiece.positions[i].x].tileColor = currentPiece.pieceColor;
@@ -270,7 +288,38 @@ int gameBoard::clearLines() {
 }
 
 int gameBoard::rotatePiece(int degrees) {
-    //TODO MAKE IT HAPPEN
+    //TODO FIX SOME WIERD ROT PROBLEMS NEAR EDGE
+    std::vector<position> newPositions;
+    float x0 = 0, y0 = 0, pi = 3.1415926;;
+    float newX = 0, newY = 0;
+    double radians = pi/180 * degrees;
+
+    for(int i = 0; i < PIECE_SEGMENTS; i++){
+        x0 = currentPiece.positions[i].x - currentPiece.originX;
+        y0 = currentPiece.positions[i].y - currentPiece.originY;
+
+        newX = x0 * cos(radians) - y0 * sin(radians);
+        newY = x0 * sin(radians) + y0 * cos(radians);
+
+        newX += currentPiece.originX;
+         newY += currentPiece.originY;
+
+        if(newX < 0 or newX > 9) return -1;
+        if(newY < 1 or newY > 22) return -1;
+        newPositions.emplace_back(newY,newX);
+    }
+
+    for(int i = 0; i < PIECE_SEGMENTS; i++){
+        board[currentPiece.positions[i].y][currentPiece.positions[i].x].isEmpty = true;
+    }
+
+    currentPiece.positions = newPositions;
+
+    for(int i = 0; i < PIECE_SEGMENTS; i++){
+        board[currentPiece.positions[i].y][currentPiece.positions[i].x].tileColor = currentPiece.pieceColor;
+        board[currentPiece.positions[i].y][currentPiece.positions[i].x].isEmpty = false;
+    }
+
     return 0;
 }
 
@@ -289,6 +338,7 @@ bool gameBoard::movePieceUp() {
     for(int i = 0; i < PIECE_SEGMENTS; i++){
         currentPiece.positions[i].y -= 1;
     }
+    currentPiece.originY -=1;
     return true;
 }
 

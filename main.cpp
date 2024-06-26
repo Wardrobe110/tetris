@@ -7,8 +7,6 @@ int main() {
     gameBoard board(1,0);
     display display(board);
 
-    std::vector<unsigned short > bro;
-
     for(int i = 0; i < 3; i++){
         board.generateNextPiece();
     }
@@ -17,18 +15,34 @@ int main() {
     //board.debugSetTile(2,5, false,RED);
     //board.debugSetTile(1,5, false,RED);
     //board.debugDisplay();
-    std::cout<<board.spawnCurrentPiece(BLUE);
+    board.spawnCurrentPiece(CYAN);
+    //display.gameDisplay();
+    display.runGameTest();
+
+
+    /*
     board.debugSetTile(19,2, false,RED);
     board.debugSetTile(20,2, false,BLUE);
     //board.debugSetTile(1,5, false,RED);
     board.debugSetTile(1,1, false,RED);
-    board.debugSetTile(3,5, false,RED);
+    //board.debugSetTile(3,5, false,RED);
 
     for(int i = 0; i < BOARD_WIDTH; i++){
         board.debugSetTile(15,i, false, YELLOW);
     }
 
+    for(int i = 0; i < BOARD_WIDTH; i++){
+        board.debugSetTile(18,i, false, CYAN);
+    }
+
     display.gameDisplay();
+    board.rotatePiece(-90);
+    display.gameDisplay();
+    for(int i = 0; i < 6; i++){
+        board.movePiece(0,1);
+    }
+    display.gameDisplay();
+    board.rotatePiece(90);
     //board.holdPiece();
     /*
     std::cout<<board.movePiece(1,0);
@@ -37,10 +51,9 @@ int main() {
     //board.holdPiece();
     display.gameDisplay();
      */
-    std::cout<<board.clearLines();
+    //std::cout<<board.clearLines();
 
-    display.gameDisplay();
-
+    //display.gameDisplay();
 
     /*
     std::cout<<board.movePieceLeft();
@@ -71,5 +84,4 @@ int main() {
     //board.debugDisplay();
     //display display(board);
     //display.gameDisplay();
-    return 0;
 }

@@ -4,6 +4,7 @@
 
 #include "display.h"
 #include "ftxui/component/screen_interactive.hpp"
+#include "ftxui/component/component.hpp"
 
 
 display::display(gameBoard &game): game(game) {
@@ -212,7 +213,7 @@ ftxui::Element display::nextPiecesDisplay(std::vector<enum color> nextColors) {
 }
 
 //============//Display//============//
-void display::gameDisplay() {
+std::shared_ptr<ftxui::Node> display::gameDisplay() {
     using namespace ftxui;
 
     auto info = vbox({
@@ -248,11 +249,53 @@ void display::gameDisplay() {
         next,
     });
 
-    std::string reset_position;
-    auto screen = Screen::Create(Dimension::Full());
-    Render(screen, result);
-    screen.Print();
+    return result;
 
+}
+
+void display::runGameTest() {
+    using namespace ftxui;
+    auto screen = ScreenInteractive::TerminalOutput();
+
+    auto renderer = Renderer([=] { return gameDisplay(); });
+    renderer |= CatchEvent([&](Event event) {
+        //Quit
+        if (event == Event::Character('q')) {
+            screen.ExitLoopClosure()();
+            return true;
+        }
+        //Movement
+        if (event == Event::ArrowDown){
+            game.movePiece(1,0);
+            return true;
+        }
+        if (event == Event::ArrowRight){
+            game.movePiece(0,1);
+            return true;
+        }
+        if (event == Event::ArrowLeft){
+            game.movePiece(0,-1);
+            return true;
+        }
+        //Rotation
+        if (event == Event::ArrowUp){
+            game.rotatePiece(90);
+            return true;
+        }
+        if (event == Event::Character('z')) {
+            game.rotatePiece(-90);
+            return true;
+        }
+        //Hold
+        if (event == Event::Character('c')) {
+            game.holdPiece();
+            return true;
+        }
+
+
+        return false;
+    });
+    screen.Loop(renderer);
 }
 
 

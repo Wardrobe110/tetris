@@ -23,8 +23,6 @@ public:
     explicit display(gameBoard &game);
 
 
-
-
     //======//Elements//======//
     static ftxui::Element heldPieceDisplay(enum color pieceColor, bool isHoldingPiece);
     static ftxui::Element gameInfoDisplay(unsigned int level, float levelProgress, unsigned int score, unsigned short lines);
@@ -32,7 +30,8 @@ public:
     static ftxui::Element nextPiecesDisplay(std::vector<enum color> nextColors);
 
     //======//Display//======//
-    void gameDisplay();
+    std::shared_ptr<ftxui::Node> gameDisplay();
+    void runGameTest();
 };
 
 

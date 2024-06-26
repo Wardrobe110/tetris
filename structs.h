@@ -35,6 +35,8 @@ struct position{
 struct piece {
     std::vector<position> positions;
     color pieceColor;
+    float originX;
+    float originY;
 
     piece();
     //explicit piece(position pos1, position pos2, position pos3, position pos4, enum color bro);
