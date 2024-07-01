@@ -202,25 +202,23 @@ void gameBoard::updateLevelProgress() {
 }
 
 int gameBoard::movePiece(short dy, short dx) {
-    //TODO FIX MOVING OUTSIDE THE EDGE
     bool pieceFlag = false;
 
     //Check if you can move piece
     if(dy < 0) return false;
     for(int i = 0; i < PIECE_SEGMENTS; i++){
-        if(currentPiece.positions[i].x == 9){
-            return -1;
-        }else{
-            pieceFlag = false;
-            if(!isEmpty(currentPiece.positions[i].y + dy, currentPiece.positions[i].x + dx)){
-                for(int j = 0; j < PIECE_SEGMENTS; j++){
-                    if(currentPiece.positions[j].y == currentPiece.positions[i].y + dy and currentPiece.positions[j].x == currentPiece.positions[i].x + dx){
-                        pieceFlag = true;
-                        break;
-                    }
+        pieceFlag = false;
+
+        if(isTileViable(currentPiece.positions[i].y + dy, currentPiece.positions[i].x + dx) == false) return -1;
+
+        if(!isEmpty(currentPiece.positions[i].y + dy, currentPiece.positions[i].x + dx)){
+            for(int j = 0; j < PIECE_SEGMENTS; j++){
+                if(currentPiece.positions[j].y == currentPiece.positions[i].y + dy and currentPiece.positions[j].x == currentPiece.positions[i].x + dx){
+                    pieceFlag = true;
+                    break;
                 }
-                if(pieceFlag == false) return -1;
             }
+            if(pieceFlag == false) return -1;
         }
     }
 
@@ -288,10 +286,10 @@ int gameBoard::clearLines() {
 }
 
 int gameBoard::rotatePiece(int degrees) {
-    //TODO FIX SOME WIERD ROT PROBLEMS NEAR EDGE
     std::vector<position> newPositions;
     float x0 = 0, y0 = 0, pi = 3.1415926;;
     float newX = 0, newY = 0;
+    int intX = 0, intY = 0;
     double radians = pi/180 * degrees;
 
     for(int i = 0; i < PIECE_SEGMENTS; i++){
@@ -302,11 +300,13 @@ int gameBoard::rotatePiece(int degrees) {
         newY = x0 * sin(radians) + y0 * cos(radians);
 
         newX += currentPiece.originX;
-         newY += currentPiece.originY;
+        newY += currentPiece.originY;
 
-        if(newX < 0 or newX > 9) return -1;
-        if(newY < 1 or newY > 22) return -1;
-        newPositions.emplace_back(newY,newX);
+        intX = roundl(newX);
+        intY = roundl(newY);
+
+        if(isTileViable(intY, intX) == false) return -1;
+        newPositions.emplace_back(intY,intX);
     }
 
     for(int i = 0; i < PIECE_SEGMENTS; i++){
@@ -378,6 +378,12 @@ std::vector<unsigned short> gameBoard::findCompleteLines() {
     return fullLineIndexes;
 }
 
+bool gameBoard::isTileViable(int y, int x) {
+    if(x < 0 or x > 9) return false;
+    if(y < 0 or y > 20) return false;
+    return true;
+}
+
 //============//Getters//============//
 bool gameBoard::isEmpty(int y, int x) {
     return board[y][x].isEmpty;
@@ -414,5 +420,7 @@ std::vector<enum color> gameBoard::getNextPieces() const {
 float gameBoard::getLevelProgress() const {
     return levelProgress;
 }
+
+
 
 

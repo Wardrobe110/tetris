@@ -10,14 +10,26 @@ int main() {
     for(int i = 0; i < 3; i++){
         board.generateNextPiece();
     }
-    //board.generateNextPiece();
+
     board.setBoardEmpty();
+    board.spawnCurrentPiece(CYAN);
+    display.runGameTest();
+    /*
+    board.debugDisplay();
+    board.movePiece(0,-1);
+    board.movePiece(0,-1);
+    board.movePiece(0,-1);
+    board.debugDisplay();
+    board.rotatePiece(-90);
+    board.debugDisplay();
+    */
+    //board.generateNextPiece();
+
     //board.debugSetTile(2,5, false,RED);
     //board.debugSetTile(1,5, false,RED);
     //board.debugDisplay();
-    board.spawnCurrentPiece(CYAN);
+
     //display.gameDisplay();
-    display.runGameTest();
 
 
     /*

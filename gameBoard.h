@@ -53,6 +53,7 @@ public:
     bool canPlacePiece();
     unsigned short sumUpTo(unsigned  short x);
     std::vector<unsigned short > findCompleteLines();
+    bool isTileViable(int y, int x);
 
     //======//Getters//======//
     bool isEmpty(int y, int x);
