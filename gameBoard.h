@@ -31,22 +31,24 @@ class gameBoard {
     bool heldPieceThisTurn;
 
 public:
-    gameBoard(unsigned short level, bool scoringTypeFixed);
+    gameBoard(bool scoringTypeFixed);
 
     //======//Debug//======//
     void debugDisplay();
     void debugSetTile(int y, int x, bool empty, enum color color);
 
     //======//Functions//======//
-    void setBoardEmpty();
+    void resetBoard(unsigned short lvl);
     void generateNextPiece();
     int spawnCurrentPiece(enum color pieceColor);
     void updateLevel();
     void updateLevelProgress();
     int movePiece(short dy, short dx);
+    void hardDrop();
     int holdPiece();
     int clearLines();
     int rotatePiece(int degrees);
+    int processGame();
 
     //======//Helpers//======//
     bool movePieceUp();
@@ -54,6 +56,7 @@ public:
     unsigned short sumUpTo(unsigned  short x);
     std::vector<unsigned short > findCompleteLines();
     bool isTileViable(int y, int x);
+    std::vector<enum color> generateColorVector();
 
     //======//Getters//======//
     bool isEmpty(int y, int x);

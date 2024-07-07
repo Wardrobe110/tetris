@@ -5,10 +5,10 @@
 
 #include "gameBoard.h"
 
-gameBoard::gameBoard(unsigned short level, bool scoringTypeFixed): level(level), isScoringTypeFixed(scoringTypeFixed) {
+gameBoard::gameBoard(bool scoringTypeFixed):isScoringTypeFixed(scoringTypeFixed) {
     score = 0;
     clearedLines = 0;
-    nextPieces.resize(3);
+    //nextPieces.resize(7);
     isHoldingPiece = false;
     levelProgress = 0;
     heldPieceThisTurn = false;
@@ -67,41 +67,31 @@ void gameBoard::debugSetTile(int y, int x, bool empty, enum color color) {
 }
 
 //============//Functions//============//
-void gameBoard::setBoardEmpty() {
+void gameBoard::resetBoard(unsigned short lvl) {
     for(int i = 0; i < BOARD_HEIGHT; i++){
         for(int j = 0; j < BOARD_WIDTH; j++) {
             board[i][j].isEmpty = true;
         }
     }
+
+    level = lvl;
+    score = 0;
+    isHoldingPiece = false;
+    levelProgress = 0;
+    heldPieceThisTurn = false;
+    nextPieces = generateColorVector();
+    spawnCurrentPiece(nextPieces[0]);
+    generateNextPiece();
 }
 
 void gameBoard::generateNextPiece() {
-    //TODO BAG GRAB GENERATOR
-    nextPieces[0] = nextPieces [1];
-    nextPieces[1] = nextPieces [2];
-    switch (rand()%7) {
-        case 0:
-            nextPieces[2] = RED;
-            break;
-        case 1:
-            nextPieces[2] = WHITE;
-            break;
-        case 2:
-            nextPieces[2] = YELLOW;
-            break;
-        case 3:
-            nextPieces[2] = GREEN;
-            break;
-        case 4:
-            nextPieces[2] = CYAN;
-            break;
-        case 5:
-            nextPieces[2] = BLUE;
-            break;
-        case 6:
-            nextPieces[2] = VIOLET;
-            break;
+    if(nextPieces.size() < 8){
+        std::vector<enum color> moreColors;
+        moreColors = generateColorVector();
+        nextPieces.insert(nextPieces.end(), moreColors.begin(), moreColors.end());
     }
+
+    nextPieces.erase(nextPieces.begin());
 }
 
 int gameBoard::spawnCurrentPiece(enum color pieceColor) {
@@ -184,6 +174,7 @@ int gameBoard::spawnCurrentPiece(enum color pieceColor) {
 
 void gameBoard::updateLevel() {
     if(isScoringTypeFixed){
+        //TODO FIX IT
         if(clearedLines%10 == 0) level++;
         //levelProgress = (clearedLines%10)/10;
     }else{
@@ -193,7 +184,6 @@ void gameBoard::updateLevel() {
 }
 
 void gameBoard::updateLevelProgress() {
-
     if(isScoringTypeFixed){
         levelProgress = (clearedLines%10) / 10.0;
     }else{
@@ -237,7 +227,12 @@ int gameBoard::movePiece(short dy, short dx) {
         board[currentPiece.positions[i].y][currentPiece.positions[i].x].tileColor = currentPiece.pieceColor;
     }
 
-    return 1;
+    return 0;
+}
+
+void gameBoard::hardDrop() {
+    //TODO IDK SEEMS BAD
+    while(movePiece(1,0) == 0);
 }
 
 int gameBoard::holdPiece() {
@@ -286,6 +281,8 @@ int gameBoard::clearLines() {
 }
 
 int gameBoard::rotatePiece(int degrees) {
+    //TODO ADD WALL BOUNCING
+    // LOW PRIORITY!!!
     std::vector<position> newPositions;
     float x0 = 0, y0 = 0, pi = 3.1415926;;
     float newX = 0, newY = 0;
@@ -306,6 +303,7 @@ int gameBoard::rotatePiece(int degrees) {
         intY = roundl(newY);
 
         if(isTileViable(intY, intX) == false) return -1;
+
         newPositions.emplace_back(intY,intX);
     }
 
@@ -319,6 +317,16 @@ int gameBoard::rotatePiece(int degrees) {
         board[currentPiece.positions[i].y][currentPiece.positions[i].x].tileColor = currentPiece.pieceColor;
         board[currentPiece.positions[i].y][currentPiece.positions[i].x].isEmpty = false;
     }
+
+    return 0;
+}
+
+int gameBoard::processGame() {
+    clearLines();
+    updateLevel();
+    updateLevelProgress();
+    if(spawnCurrentPiece(nextPieces[0]) == -1) return -1;
+    generateNextPiece();
 
     return 0;
 }
@@ -366,8 +374,10 @@ std::vector<unsigned short> gameBoard::findCompleteLines() {
     for(int i = 1; i < BOARD_HEIGHT; i++){
         lineFullFlag = true;
         for(int j = 0; j < BOARD_WIDTH; j++){
-            if(isEmpty(i,j)) lineFullFlag = false;
-            break;
+            if(isEmpty(i,j)){
+                lineFullFlag = false;
+                break;
+            }
         }
 
         if(lineFullFlag){
@@ -381,7 +391,38 @@ std::vector<unsigned short> gameBoard::findCompleteLines() {
 bool gameBoard::isTileViable(int y, int x) {
     if(x < 0 or x > 9) return false;
     if(y < 0 or y > 20) return false;
+
+    bool isPartPieceFlag = false;
+
+    if(isEmpty(y,x) == false){
+        for(int i = 0; i < PIECE_SEGMENTS; i++){
+            if(x == currentPiece.positions[i].x and y == currentPiece.positions[i].y){
+                isPartPieceFlag = true;
+                break;
+            }
+        }
+        if(isPartPieceFlag == false) return false;
+    }
+
+
     return true;
+}
+
+std::vector<enum color> gameBoard::generateColorVector() {
+    std::vector<enum color> shuffledColors;
+    std::vector<enum color> possibleColors = {RED, WHITE, YELLOW, GREEN, BLUE, VIOLET, CYAN};
+    int index = 0;
+
+    for(int i = 6; i >= 0; i--){
+        //randomize index from i+1;
+        index = rand()%(i + 1);
+        //push form possible colors to shuffled colors;
+        shuffledColors.emplace_back(possibleColors[index]);
+        //rm form possible colors
+        possibleColors.erase(possibleColors.begin() + index);
+    }
+
+    return shuffledColors;
 }
 
 //============//Getters//============//
@@ -420,6 +461,9 @@ std::vector<enum color> gameBoard::getNextPieces() const {
 float gameBoard::getLevelProgress() const {
     return levelProgress;
 }
+
+
+
 
 
 

@@ -277,6 +277,11 @@ void display::runGameTest() {
             game.movePiece(0,-1);
             return true;
         }
+        if (event == Event::Character(' ')){
+            game.hardDrop();
+            game.processGame();
+            return true;
+        }
         //Rotation
         if (event == Event::ArrowUp){
             game.rotatePiece(90);

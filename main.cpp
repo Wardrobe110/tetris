@@ -4,15 +4,18 @@
 
 int main() {
     srand(time(0));
-    gameBoard board(1,0);
+    gameBoard board(1);
     display display(board);
 
-    for(int i = 0; i < 3; i++){
-        board.generateNextPiece();
+    board.resetBoard(1);
+/*
+    for(int i = 0; i < 24; i++){
+        board.debugDisplay();
+        board.movePiece(1,0);
+        board.processGame();
     }
+*/
 
-    board.setBoardEmpty();
-    board.spawnCurrentPiece(CYAN);
     display.runGameTest();
     /*
     board.debugDisplay();
